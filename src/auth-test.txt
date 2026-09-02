@@ -1,0 +1,1 @@
+Pinia Authentication Store is configured here.
