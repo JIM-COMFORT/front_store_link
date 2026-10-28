@@ -40,8 +40,28 @@ const removeToast = (id) => {
 // --- Active tab ---
 const activeTab = ref('login')
 
-// --- Carousel ---
-const stages = ['pending', 'priced', 'locked']
+// --- Carousel slides (LEFT PANEL PHOTOS) ---
+// Swap these URLs for your own photos whenever you're ready.
+// Keep the `key` values ('pending' | 'priced' | 'locked') as they drive the copy + tint.
+const stageSlides = [
+  {
+    key: 'pending',
+    image: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=1400&q=80',
+    alt: 'A product photographed for sale',
+  },
+  {
+    key: 'priced',
+    image: 'https://images.unsplash.com/photo-1600880292203-757bb62b4baf?auto=format&fit=crop&w=1400&q=80',
+    alt: 'Two people comparing offers at a table',
+  },
+  {
+    key: 'locked',
+    image: 'https://images.unsplash.com/photo-1521791136064-7986c2920216?auto=format&fit=crop&w=1400&q=80',
+    alt: 'A handshake closing a deal',
+  },
+]
+
+const stages = stageSlides.map(s => s.key)
 const currentStageIndex = ref(0)
 const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
 let cycleTimer = null
@@ -167,61 +187,24 @@ onBeforeUnmount(() => {
       </div>
     </div>
 
-    <!-- Brand Panel (unchanged) -->
+    <!-- Brand Panel -->
     <aside class="brand-panel">
       <div class="scene-bg">
         <div
-          v-for="stage in stages"
-          :key="stage"
+          v-for="(slide, index) in stageSlides"
+          :key="slide.key"
           class="scene"
-          :class="{ active: currentStageIndex === stages.indexOf(stage) }"
-          :data-stage="stage"
+          :class="{ active: currentStageIndex === index }"
+          :data-stage="slide.key"
         >
-          <!-- Your SVGs (same as before) -->
-          <svg v-if="stage === 'pending'" viewBox="0 0 600 800" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
-            <rect x="70" y="120" width="90" height="120" rx="8" transform="rotate(-8 115 180)" fill="none" stroke="rgba(255,255,255,.14)" stroke-width="1.5"/>
-            <rect x="380" y="90" width="100" height="130" rx="8" transform="rotate(6 430 155)" fill="none" stroke="rgba(255,255,255,.1)" stroke-width="1.5"/>
-            <rect x="220" y="280" width="85" height="115" rx="8" transform="rotate(-4 262 337)" fill="none" stroke="rgba(255,255,255,.16)" stroke-width="1.5"/>
-            <rect x="60" y="450" width="95" height="125" rx="8" transform="rotate(5 107 512)" fill="none" stroke="rgba(255,255,255,.09)" stroke-width="1.5"/>
-            <rect x="400" y="480" width="90" height="120" rx="8" transform="rotate(-7 445 540)" fill="none" stroke="rgba(255,255,255,.13)" stroke-width="1.5"/>
-            <rect x="230" y="600" width="88" height="118" rx="8" transform="rotate(3 274 659)" fill="none" stroke="rgba(255,255,255,.11)" stroke-width="1.5"/>
-            <circle cx="115" cy="150" r="3" fill="#94a3b8" opacity=".6"/>
-            <circle cx="430" cy="125" r="3" fill="#94a3b8" opacity=".5"/>
-            <circle cx="262" cy="310" r="3" fill="#94a3b8" opacity=".6"/>
-          </svg>
-          <svg v-else-if="stage === 'priced'" viewBox="0 0 600 800" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
-            <defs>
-              <radialGradient id="blueGlow" cx="50%" cy="45%" r="55%">
-                <stop offset="0%" stop-color="#1d4ed8" stop-opacity=".35"/>
-                <stop offset="100%" stop-color="#1d4ed8" stop-opacity="0"/>
-              </radialGradient>
-            </defs>
-            <circle cx="300" cy="360" r="260" fill="url(#blueGlow)"/>
-            <line x1="130" y1="190" x2="300" y2="360" stroke="rgba(96,165,250,.35)" stroke-width="1.5"/>
-            <line x1="470" y1="160" x2="300" y2="360" stroke="rgba(96,165,250,.3)" stroke-width="1.5"/>
-            <line x1="120" y1="550" x2="300" y2="360" stroke="rgba(96,165,250,.3)" stroke-width="1.5"/>
-            <line x1="460" y1="570" x2="300" y2="360" stroke="rgba(96,165,250,.35)" stroke-width="1.5"/>
-            <rect x="116" y="176" width="28" height="28" rx="5" transform="rotate(45 130 190)" fill="none" stroke="#60a5fa" stroke-width="1.5"/>
-            <rect x="456" y="146" width="28" height="28" rx="5" transform="rotate(45 470 160)" fill="none" stroke="#60a5fa" stroke-width="1.5"/>
-            <rect x="106" y="536" width="28" height="28" rx="5" transform="rotate(45 120 550)" fill="none" stroke="#60a5fa" stroke-width="1.5"/>
-            <rect x="446" y="556" width="28" height="28" rx="5" transform="rotate(45 460 570)" fill="none" stroke="#60a5fa" stroke-width="1.5"/>
-            <circle cx="300" cy="360" r="5" fill="#93c5fd"/>
-          </svg>
-          <svg v-else-if="stage === 'locked'" viewBox="0 0 600 800" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
-            <defs>
-              <radialGradient id="mintGlow" cx="50%" cy="42%" r="50%">
-                <stop offset="0%" stop-color="#10b981" stop-opacity=".4"/>
-                <stop offset="100%" stop-color="#10b981" stop-opacity="0"/>
-              </radialGradient>
-            </defs>
-            <circle cx="300" cy="340" r="240" fill="url(#mintGlow)"/>
-            <circle cx="300" cy="340" r="150" fill="none" stroke="rgba(16,185,129,.18)" stroke-width="1"/>
-            <circle cx="300" cy="340" r="195" fill="none" stroke="rgba(16,185,129,.1)" stroke-width="1"/>
-            <g transform="translate(255,290)">
-              <rect x="0" y="55" width="90" height="70" rx="12" fill="none" stroke="#6ee7b7" stroke-width="3"/>
-              <path d="M18 55V35a27 27 0 0 1 54 0v20" fill="none" stroke="#6ee7b7" stroke-width="3"/>
-            </g>
-          </svg>
+          <img
+            class="scene-img"
+            :src="slide.image"
+            :alt="slide.alt"
+            :loading="index === 0 ? 'eager' : 'lazy'"
+            decoding="async"
+          />
+          <div class="scene-tint"></div>
         </div>
       </div>
       <div class="brand-overlay"></div>
@@ -273,8 +256,6 @@ onBeforeUnmount(() => {
     <!-- Auth Panel -->
     <main class="auth-panel">
       <div class="auth-card">
-        <!-- Removed inline messages – now handled by toasts -->
-
         <div class="auth-tabs">
           <button
             class="tab"
@@ -345,21 +326,51 @@ onBeforeUnmount(() => {
 </template>
 
 <style scoped>
-/* ---------- Existing styles (unchanged) ---------- */
 .auth-shell{display:grid;grid-template-columns:1fr 1fr;min-height:100vh;}
 .brand-panel{
   position:relative;overflow:hidden;
   background:var(--ink);color:var(--white);
   padding:48px;display:flex;flex-direction:column;justify-content:space-between;
 }
-.scene-bg{position:absolute;inset:0;z-index:0;}
-.scene{position:absolute;inset:0;opacity:0;transition:opacity 1.2s ease;}
+
+/* ---------- Photo scenes ---------- */
+.scene-bg{position:absolute;inset:0;z-index:0;background:#0f172a;}
+.scene{
+  position:absolute;inset:0;opacity:0;
+  transition:opacity 1.2s ease;
+  background:#0f172a;
+}
 .scene.active{opacity:1;}
-.scene svg{width:100%;height:100%;display:block;}
+
+.scene-img{
+  position:absolute;inset:0;
+  width:100%;height:100%;
+  object-fit:cover;object-position:center;
+  transform:scale(1.04);
+  transition:transform 7s ease-out;
+  will-change:transform;
+}
+/* slow Ken Burns drift while a slide is active */
+.scene.active .scene-img{transform:scale(1.14);}
+
+/* Colour tint per stage — keeps the brand palette over real photography */
+.scene-tint{position:absolute;inset:0;pointer-events:none;}
+.scene[data-stage="pending"] .scene-tint{
+  background:linear-gradient(165deg, rgba(15,23,42,.35) 0%, rgba(51,65,85,.55) 100%);
+}
+.scene[data-stage="priced"] .scene-tint{
+  background:linear-gradient(165deg, rgba(29,78,216,.45) 0%, rgba(15,23,42,.62) 100%);
+}
+.scene[data-stage="locked"] .scene-tint{
+  background:linear-gradient(165deg, rgba(16,185,129,.40) 0%, rgba(15,23,42,.66) 100%);
+}
+
+/* Dark gradient for text legibility */
 .brand-overlay{
   position:absolute;inset:0;z-index:1;
-  background:linear-gradient(180deg, rgba(15,23,42,.5) 0%, rgba(15,23,42,.68) 55%, rgba(15,23,42,.92) 100%);
+  background:linear-gradient(180deg, rgba(15,23,42,.35) 0%, rgba(15,23,42,.55) 55%, rgba(15,23,42,.90) 100%);
 }
+
 .nav-logo{position:relative;z-index:2;font-weight:800;font-size:1.2rem;letter-spacing:-0.02em;color:var(--white);text-decoration:none;}
 .nav-logo b{color:#6ee7b7;}
 .brand-copy{position:relative;z-index:2;max-width:420px;}
@@ -368,6 +379,7 @@ onBeforeUnmount(() => {
   font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:.7rem;font-weight:600;letter-spacing:.07em;
   background:rgba(255,255,255,.08);
   padding:8px 13px;border-radius:20px;margin-bottom:22px;
+  backdrop-filter:blur(6px);
 }
 .eyebrow .sep{color:rgba(255,255,255,.3);}
 .ey-word{color:rgba(255,255,255,.4);transition:color .5s ease;}
@@ -427,7 +439,10 @@ onBeforeUnmount(() => {
 a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible{
   outline:2px solid var(--trust-blue);outline-offset:2px;border-radius:6px;
 }
-@media (prefers-reduced-motion:reduce){*{transition:none !important;}}
+@media (prefers-reduced-motion:reduce){
+  *{transition:none !important;}
+  .scene-img{transform:none !important;}
+}
 @media (max-width:900px){
   .auth-shell{grid-template-columns:1fr;}
   .brand-panel{padding:36px 28px;min-height:360px;}
@@ -449,7 +464,7 @@ a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible{
   gap: 10px;
   max-width: 360px;
   width: 100%;
-  pointer-events: none; /* allow clicks to pass through container, but toasts themselves are clickable */
+  pointer-events: none;
 }
 
 .toast {
