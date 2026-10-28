@@ -49,7 +49,10 @@ const filteredOrders = computed(() => {
 /* ---------- Helpers ---------- */
 const formatPrice = (price) => {
   if (!price || Number(price) <= 0) return null;
-  return `$${Number(price).toFixed(2)}`;
+  return `MWK ${Number(price).toLocaleString('en-US', {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  })}`;
 };
 
 const qtyLabel = (n) => `${n} ${n === 1 ? 'unit' : 'units'}`;
@@ -456,7 +459,7 @@ onMounted(fetchOrders);
 .page-intro .lead { color: var(--slate-soft); font-size: 0.95rem; margin: 0; }
 
 /* =========================================================
-   CARDS — high-visibility white cards with green accents
+   CARDS — high-visibility white cards with green borders
    ========================================================= */
 .card {
   position: relative;
@@ -467,16 +470,6 @@ onMounted(fetchOrders);
     0 6px 24px -8px var(--brand-glow),
     0 1px 3px rgba(15, 23, 42, 0.04);
   overflow: hidden;
-}
-
-/* 4px green accent bar on top of every card */
-.card::before {
-  content: '';
-  position: absolute;
-  top: 0; left: 0; right: 0;
-  height: 4px;
-  background: linear-gradient(90deg, var(--brand) 0%, var(--brand-dark) 100%);
-  z-index: 1;
 }
 
 .form-card { padding: 30px 30px 28px; margin-bottom: 24px; }
@@ -650,7 +643,6 @@ onMounted(fetchOrders);
   padding: 18px 20px;
   background: var(--white);
   border: 1.5px solid var(--line);
-  border-left: 4px solid var(--line);
   border-radius: 12px;
   box-shadow: 0 2px 8px -4px rgba(15, 23, 42, 0.08);
   transition: box-shadow 0.2s ease, transform 0.15s ease, border-color 0.2s ease;
@@ -662,10 +654,9 @@ onMounted(fetchOrders);
     0 2px 6px -2px rgba(15, 23, 42, 0.06);
 }
 
-.order-card.pending { border-left-color: var(--amber); }
-.order-card.priced  { border-left-color: var(--brand); border-color: var(--brand-border); }
-.order-card.locked  {
-  border-left-color: var(--brand-deep);
+.order-card.priced { border-color: var(--brand-border); }
+
+.order-card.locked {
   border-color: var(--brand-border);
   background: linear-gradient(180deg, #ffffff 0%, #f6fffb 100%);
 }

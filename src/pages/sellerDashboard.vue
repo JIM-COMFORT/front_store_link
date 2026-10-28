@@ -47,16 +47,22 @@ const filteredOrders = computed(() => {
 });
 
 /* ---------- Helpers ---------- */
+const fmtMWK = (n) =>
+  Number(n).toLocaleString('en-US', {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  });
+
 const formatPrice = (price) => {
   if (!price || Number(price) <= 0) return null;
-  return `MWK${Number(price).toFixed(2)}`;
+  return `MWK ${fmtMWK(price)}`;
 };
 
 const unitPrice = (order) => {
   const total = Number(order.price);
   const qty = Number(order.quantity);
   if (!total || total <= 0 || !qty || qty <= 0) return null;
-  return `MWK   ${(total / qty).toFixed(2)} / unit`;
+  return `MWK ${fmtMWK(total / qty)} / unit`;
 };
 
 const qtyLabel = (n) => `${n} ${n === 1 ? 'unit' : 'units'}`;
@@ -252,10 +258,10 @@ onMounted(fetchMarketplace);
                   <input
                     type="number"
                     v-model.number="priceInputs[order._id]"
-                    placeholder="  Wholesale total"
+                    placeholder="Wholesale total"
                     min="1"
                     step="0.01"
-                    :aria-label="`Total wholesale price for ${order.itemName}`"
+                    :aria-label="`Total wholesale price for ${order.itemName} in MWK`"
                   />
                 </div>
                 <button
@@ -410,7 +416,7 @@ onMounted(fetchMarketplace);
 .page-intro .lead { color: var(--slate-soft); font-size: 0.95rem; margin: 0; }
 
 /* =========================================================
-   CARDS — high-visibility white cards with blue accents
+   CARDS — white cards with blue borders (no top strip)
    ========================================================= */
 .card {
   position: relative;
@@ -421,15 +427,6 @@ onMounted(fetchMarketplace);
     0 6px 24px -8px var(--brand-glow),
     0 1px 3px rgba(15, 23, 42, 0.04);
   overflow: hidden;
-}
-
-.card::before {
-  content: '';
-  position: absolute;
-  top: 0; left: 0; right: 0;
-  height: 4px;
-  background: linear-gradient(90deg, var(--brand) 0%, var(--brand-dark) 100%);
-  z-index: 1;
 }
 
 .orders-card { padding: 30px 30px 28px; }
@@ -501,7 +498,7 @@ onMounted(fetchMarketplace);
 }
 
 /* =========================================================
-   ORDER LIST
+   ORDER LIST — no left color strips
    ========================================================= */
 .order-list { display: flex; flex-direction: column; gap: 14px; }
 
@@ -510,7 +507,6 @@ onMounted(fetchMarketplace);
   padding: 18px 20px;
   background: var(--white);
   border: 1.5px solid var(--line);
-  border-left: 4px solid var(--line);
   border-radius: 12px;
   box-shadow: 0 2px 8px -4px rgba(15, 23, 42, 0.08);
   transition: box-shadow 0.2s ease, transform 0.15s ease, border-color 0.2s ease;
@@ -522,10 +518,9 @@ onMounted(fetchMarketplace);
     0 2px 6px -2px rgba(15, 23, 42, 0.06);
 }
 
-.order-card.pending { border-left-color: var(--amber); }
-.order-card.priced  { border-left-color: var(--brand); border-color: var(--brand-border); }
-.order-card.locked  {
-  border-left-color: var(--mint);
+.order-card.priced { border-color: var(--brand-border); }
+
+.order-card.locked {
   border-color: #bbf7d0;
   background: linear-gradient(180deg, #ffffff 0%, #f6fffb 100%);
 }
@@ -639,7 +634,7 @@ onMounted(fetchMarketplace);
 .step-line.done { background: var(--brand); }
 
 /* =========================================================
-   QUOTE INPUT + ACTIONS — highly visible blue border
+   QUOTE INPUT + ACTIONS — MWK prefix
    ========================================================= */
 .order-actions { display: flex; justify-content: flex-end; margin-top: 14px; }
 
@@ -651,22 +646,23 @@ onMounted(fetchMarketplace);
   justify-content: flex-end;
 }
 
-.price-field { position: relative; flex: 1; max-width: 260px; }
+.price-field { position: relative; flex: 1; max-width: 280px; }
 
 .price-field .currency {
   position: absolute;
-  left: 13px;
+  left: 12px;
   top: 50%;
   transform: translateY(-50%);
-  font-size: 0.9rem;
+  font-size: 0.68rem;
   font-weight: 800;
+  letter-spacing: 0.04em;
   color: var(--brand-deep);
   pointer-events: none;
 }
 
 .price-field input {
   width: 100%;
-  padding: 11px 14px 11px 28px;
+  padding: 11px 14px 11px 52px;
   border: 1.5px solid var(--brand-input);
   border-radius: 9px;
   font-size: 0.9rem;
