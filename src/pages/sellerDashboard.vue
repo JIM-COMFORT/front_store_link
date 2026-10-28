@@ -49,14 +49,14 @@ const filteredOrders = computed(() => {
 /* ---------- Helpers ---------- */
 const formatPrice = (price) => {
   if (!price || Number(price) <= 0) return null;
-  return `$${Number(price).toFixed(2)}`;
+  return `MWK${Number(price).toFixed(2)}`;
 };
 
 const unitPrice = (order) => {
   const total = Number(order.price);
   const qty = Number(order.quantity);
   if (!total || total <= 0 || !qty || qty <= 0) return null;
-  return `$${(total / qty).toFixed(2)} / unit`;
+  return `MWK${(total / qty).toFixed(2)} / unit`;
 };
 
 const qtyLabel = (n) => `${n} ${n === 1 ? 'unit' : 'units'}`;
@@ -248,7 +248,7 @@ onMounted(fetchMarketplace);
             <div v-if="order.status !== 'locked'" class="order-actions">
               <div class="price-input-box">
                 <div class="price-field">
-                  <span class="currency" aria-hidden="true">$</span>
+                  <span class="currency" aria-hidden="true">MWK</span>
                   <input
                     type="number"
                     v-model.number="priceInputs[order._id]"
