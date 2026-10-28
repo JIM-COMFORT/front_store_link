@@ -145,7 +145,7 @@ onMounted(fetchMarketplace);
     <!-- ========== HEADER ========== -->
     <header class="dash-header">
       <div class="header-left">
-        <a class="logo" href="/">Store<b>Link</b></a>
+      <a class="nav-logo" href="/">Store<b>Link</b></a>
         <span class="header-divider" aria-hidden="true"></span>
         <span class="workspace-label">Seller Workspace</span>
       </div>
@@ -337,6 +337,10 @@ onMounted(fetchMarketplace);
   -webkit-backdrop-filter: saturate(180%) blur(12px);
   border-bottom: 1px solid var(--line);
 }
+
+.nav-logo{position:relative;z-index:2;font-weight:800;font-size:1.2rem;letter-spacing:-0.02em;color:var(--white);text-decoration:none;}
+.nav-logo b{color:#6ee7b7;}
+.brand-copy{position:relative;z-index:2;max-width:420px;}
 
 .header-left {
   display: flex;
