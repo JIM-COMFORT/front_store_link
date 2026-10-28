@@ -252,7 +252,7 @@ onMounted(fetchMarketplace);
                   <input
                     type="number"
                     v-model.number="priceInputs[order._id]"
-                    placeholder="Wholesale total"
+                    placeholder="  Wholesale total"
                     min="1"
                     step="0.01"
                     :aria-label="`Total wholesale price for ${order.itemName}`"
