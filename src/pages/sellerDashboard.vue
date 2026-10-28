@@ -56,7 +56,7 @@ const unitPrice = (order) => {
   const total = Number(order.price);
   const qty = Number(order.quantity);
   if (!total || total <= 0 || !qty || qty <= 0) return null;
-  return `MWK " "${(total / qty).toFixed(2)} / unit`;
+  return `MWK   ${(total / qty).toFixed(2)} / unit`;
 };
 
 const qtyLabel = (n) => `${n} ${n === 1 ? 'unit' : 'units'}`;
