@@ -6,11 +6,10 @@ import api from '../api.js';
 const router = useRouter();
 const orders = ref([]);
 
-// We track inputs for each individual order inside an object keyed by order ID
 const priceInputs = ref({});
 
 const isLoading = ref(true);
-const quotingId = ref(null); // id of order currently being quoted
+const quotingId = ref(null);
 const activeFilter = ref('all');
 
 /* ---------- Toast system ---------- */
@@ -36,10 +35,10 @@ const stats = computed(() => ({
 }));
 
 const filters = computed(() => [
-  { key: 'all',     label: 'All',     count: stats.value.total },
+  { key: 'all',     label: 'All',      count: stats.value.total },
   { key: 'pending', label: 'Unpriced', count: stats.value.pending },
-  { key: 'priced',  label: 'Quoted',  count: stats.value.priced },
-  { key: 'locked',  label: 'Locked',  count: stats.value.locked },
+  { key: 'priced',  label: 'Quoted',   count: stats.value.priced },
+  { key: 'locked',  label: 'Locked',   count: stats.value.locked },
 ]);
 
 const filteredOrders = computed(() => {
@@ -53,7 +52,6 @@ const formatPrice = (price) => {
   return `$${Number(price).toFixed(2)}`;
 };
 
-/** Per-unit price, only when we have both a quote and a quantity */
 const unitPrice = (order) => {
   const total = Number(order.price);
   const qty = Number(order.quantity);
@@ -71,7 +69,6 @@ const fetchMarketplace = async () => {
     const response = await api.get('/orders');
     orders.value = response.data;
 
-    // Prefill price input boxes with current values if they exist
     orders.value.forEach((order) => {
       if (order.price > 0 && priceInputs.value[order._id] == null) {
         priceInputs.value[order._id] = order.price;
@@ -145,7 +142,7 @@ onMounted(fetchMarketplace);
     <!-- ========== HEADER ========== -->
     <header class="dash-header">
       <div class="header-left">
-      <a class="nav-logo" href="/">Store<b>Link</b></a>
+        <a class="logo" href="/">Store<b>Link</b></a>
         <span class="header-divider" aria-hidden="true"></span>
         <span class="workspace-label">Seller Workspace</span>
       </div>
@@ -191,13 +188,11 @@ onMounted(fetchMarketplace);
           </div>
         </header>
 
-        <!-- Loading -->
         <div v-if="isLoading" class="state-view">
           <div class="spinner large"></div>
           <p>Loading the marketplace…</p>
         </div>
 
-        <!-- Empty -->
         <div v-else-if="filteredOrders.length === 0" class="state-view empty">
           <div class="empty-icon" aria-hidden="true">
             <svg viewBox="0 0 40 40" fill="none">
@@ -212,7 +207,6 @@ onMounted(fetchMarketplace);
           <p v-else>Try a different filter to see other requests.</p>
         </div>
 
-        <!-- List -->
         <div v-else class="order-list">
           <article
             v-for="order in filteredOrders"
@@ -243,7 +237,6 @@ onMounted(fetchMarketplace);
               </span>
             </div>
 
-            <!-- Stage progress -->
             <div class="order-stepper" aria-hidden="true">
               <span class="step done">Posted</span>
               <span class="step-line" :class="{ done: order.status !== 'pending' }"></span>
@@ -252,7 +245,6 @@ onMounted(fetchMarketplace);
               <span class="step" :class="{ done: order.status === 'locked' }">Locked</span>
             </div>
 
-            <!-- Actions -->
             <div v-if="order.status !== 'locked'" class="order-actions">
               <div class="price-input-box">
                 <div class="price-field">
@@ -296,26 +288,32 @@ onMounted(fetchMarketplace);
 
 <style scoped>
 /* =========================================================
-   THEME TOKENS (fallback-safe in case globals aren't set)
+   SELLER THEME — WHITE + BLUE
    ========================================================= */
 .dashboard {
-  --ink: var(--ink, #0f172a);
-  --white: var(--white, #ffffff);
-  --slate-soft: var(--slate-soft, #64748b);
-  --trust-blue: var(--trust-blue, #2563eb);
-  --trust-blue-dark: var(--trust-blue-dark, #1d4ed8);
-  --mint: var(--mint, #10b981);
-  --mint-bright: var(--mint-bright, #34d399);
-  --line: var(--line, #e2e8f0);
-  --mist: var(--mist, #f8fafc);
+  --brand: #2563eb;
+  --brand-dark: #1d4ed8;
+  --brand-deep: #1e40af;
+  --brand-soft: #dbeafe;
+  --brand-border: #bfdbfe;
+  --brand-input: #93c5fd;
+  --brand-hover: #60a5fa;
+  --brand-tint: #eff6ff;
+  --brand-glow: rgba(37, 99, 235, 0.16);
+
+  --ink: #0f172a;
+  --white: #ffffff;
+  --slate-soft: #64748b;
+  --line: #e2e8f0;
 
   --amber: #f59e0b;
   --amber-soft: #fef3c7;
-  --blue-soft: #dbeafe;
+
+  --mint: #10b981;
   --mint-soft: #d1fae5;
 
   min-height: 100vh;
-  background: var(--mist);
+  background: var(--brand-tint);
   color: var(--ink);
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
@@ -332,21 +330,13 @@ onMounted(fetchMarketplace);
   align-items: center;
   justify-content: space-between;
   padding: 16px 32px;
-  background: rgba(255, 255, 255, 0.85);
+  background: rgba(255, 255, 255, 0.92);
   backdrop-filter: saturate(180%) blur(12px);
   -webkit-backdrop-filter: saturate(180%) blur(12px);
-  border-bottom: 1px solid var(--line);
+  border-bottom: 1.5px solid var(--brand-border);
 }
 
-.nav-logo{position:relative;z-index:2;font-weight:800;font-size:1.2rem;letter-spacing:-0.02em;color:var(--white);text-decoration:none;}
-.nav-logo b{color:#6ee7b7;}
-.brand-copy{position:relative;z-index:2;max-width:420px;}
-
-.header-left {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-}
+.header-left { display: flex; align-items: center; gap: 16px; }
 
 .logo {
   font-weight: 800;
@@ -355,20 +345,16 @@ onMounted(fetchMarketplace);
   color: var(--ink);
   text-decoration: none;
 }
-.logo b { color: var(--mint); }
+.logo b { color: var(--brand); }
 
-.header-divider {
-  width: 1px;
-  height: 20px;
-  background: var(--line);
-}
+.header-divider { width: 1px; height: 20px; background: var(--brand-border); }
 
 .workspace-label {
   font-size: 0.78rem;
-  font-weight: 600;
+  font-weight: 700;
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  color: var(--slate-soft);
+  color: var(--brand-deep);
 }
 
 .logout-btn {
@@ -379,8 +365,8 @@ onMounted(fetchMarketplace);
   font-size: 0.85rem;
   font-weight: 600;
   color: var(--slate-soft);
-  background: transparent;
-  border: 1px solid var(--line);
+  background: var(--white);
+  border: 1.5px solid var(--line);
   border-radius: 8px;
   cursor: pointer;
   transition: all 0.15s ease;
@@ -395,24 +381,20 @@ onMounted(fetchMarketplace);
 /* =========================================================
    LAYOUT
    ========================================================= */
-.dash-main {
-  max-width: 880px;
-  margin: 0 auto;
-  padding: 40px 24px 80px;
-}
-
+.dash-main { max-width: 880px; margin: 0 auto; padding: 40px 24px 80px; }
 .page-intro { margin-bottom: 28px; }
 
 .eyebrow {
   display: inline-block;
   font-family: 'IBM Plex Mono', ui-monospace, monospace;
   font-size: 0.68rem;
-  font-weight: 600;
+  font-weight: 700;
   letter-spacing: 0.09em;
   text-transform: uppercase;
-  color: var(--trust-blue);
-  background: var(--blue-soft);
-  padding: 5px 10px;
+  color: var(--brand-deep);
+  background: var(--brand-soft);
+  border: 1px solid var(--brand-border);
+  padding: 5px 11px;
   border-radius: 999px;
   margin-bottom: 14px;
 }
@@ -425,23 +407,32 @@ onMounted(fetchMarketplace);
   line-height: 1.15;
 }
 
-.page-intro .lead {
-  color: var(--slate-soft);
-  font-size: 0.95rem;
-  margin: 0;
-}
+.page-intro .lead { color: var(--slate-soft); font-size: 0.95rem; margin: 0; }
 
 /* =========================================================
-   CARD
+   CARDS — high-visibility white cards with blue accents
    ========================================================= */
 .card {
+  position: relative;
   background: var(--white);
-  border: 1px solid var(--line);
+  border: 1.5px solid var(--brand-border);
   border-radius: 16px;
-  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+  box-shadow:
+    0 6px 24px -8px var(--brand-glow),
+    0 1px 3px rgba(15, 23, 42, 0.04);
+  overflow: hidden;
 }
 
-.orders-card { padding: 26px 28px; }
+.card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, var(--brand) 0%, var(--brand-dark) 100%);
+  z-index: 1;
+}
+
+.orders-card { padding: 30px 30px 28px; }
 
 .card-header {
   display: flex;
@@ -453,28 +444,25 @@ onMounted(fetchMarketplace);
 }
 
 .card-header h3 {
-  font-size: 1.05rem;
-  font-weight: 700;
+  font-size: 1.08rem;
+  font-weight: 800;
   letter-spacing: -0.01em;
   margin: 0 0 4px;
 }
 
-.card-header .sub {
-  font-size: 0.85rem;
-  color: var(--slate-soft);
-  margin: 0;
-}
+.card-header .sub { font-size: 0.85rem; color: var(--slate-soft); margin: 0; }
 
 /* =========================================================
-   FILTER PILLS
+   FILTER PILLS — blue container, active = blue
    ========================================================= */
 .filter-pills {
   display: flex;
   gap: 6px;
   flex-wrap: wrap;
-  padding: 4px;
-  background: var(--mist);
-  border-radius: 10px;
+  padding: 5px;
+  background: var(--brand-soft);
+  border: 1px solid var(--brand-border);
+  border-radius: 11px;
 }
 
 .filter-pill {
@@ -483,32 +471,32 @@ onMounted(fetchMarketplace);
   gap: 6px;
   padding: 7px 12px;
   font-size: 0.8rem;
-  font-weight: 600;
-  color: var(--slate-soft);
+  font-weight: 700;
+  color: var(--brand-deep);
   background: transparent;
   border: none;
   border-radius: 7px;
   cursor: pointer;
   transition: all 0.15s ease;
 }
-.filter-pill:hover { color: var(--ink); }
+.filter-pill:hover { background: rgba(255, 255, 255, 0.65); }
 
 .filter-pill.active {
-  background: var(--white);
-  color: var(--ink);
-  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.08);
+  background: var(--brand);
+  color: var(--white);
+  box-shadow: 0 2px 8px -2px rgba(37, 99, 235, 0.55);
 }
 
 .pill-count {
   font-size: 0.7rem;
-  font-weight: 700;
+  font-weight: 800;
   padding: 1px 6px;
   border-radius: 999px;
-  background: rgba(15, 23, 42, 0.07);
-  color: var(--slate-soft);
+  background: rgba(30, 64, 175, 0.12);
+  color: var(--brand-deep);
 }
 .filter-pill.active .pill-count {
-  background: var(--ink);
+  background: rgba(255, 255, 255, 0.28);
   color: var(--white);
 }
 
@@ -520,48 +508,53 @@ onMounted(fetchMarketplace);
 .order-card {
   position: relative;
   padding: 18px 20px;
-  border: 1px solid var(--line);
-  border-left: 3px solid var(--line);
-  border-radius: 12px;
   background: var(--white);
-  transition: box-shadow 0.2s ease, transform 0.15s ease;
+  border: 1.5px solid var(--line);
+  border-left: 4px solid var(--line);
+  border-radius: 12px;
+  box-shadow: 0 2px 8px -4px rgba(15, 23, 42, 0.08);
+  transition: box-shadow 0.2s ease, transform 0.15s ease, border-color 0.2s ease;
 }
 .order-card:hover {
-  box-shadow: 0 6px 20px -8px rgba(15, 23, 42, 0.12);
+  transform: translateY(-1px);
+  box-shadow:
+    0 10px 26px -10px rgba(15, 23, 42, 0.16),
+    0 2px 6px -2px rgba(15, 23, 42, 0.06);
 }
 
 .order-card.pending { border-left-color: var(--amber); }
-.order-card.priced  { border-left-color: var(--trust-blue); }
-.order-card.locked  { border-left-color: var(--mint); background: #fbfffd; }
-
-.order-top {
-  display: flex;
-  align-items: center;
-  gap: 14px;
+.order-card.priced  { border-left-color: var(--brand); border-color: var(--brand-border); }
+.order-card.locked  {
+  border-left-color: var(--mint);
+  border-color: #bbf7d0;
+  background: linear-gradient(180deg, #ffffff 0%, #f6fffb 100%);
 }
+
+.order-top { display: flex; align-items: center; gap: 14px; }
 
 .order-avatar {
   flex-shrink: 0;
-  width: 42px;
-  height: 42px;
-  border-radius: 10px;
+  width: 44px;
+  height: 44px;
+  border-radius: 11px;
   display: flex;
   align-items: center;
   justify-content: center;
   font-weight: 800;
-  font-size: 1rem;
+  font-size: 1.05rem;
   color: var(--slate-soft);
-  background: var(--mist);
+  background: var(--brand-tint);
+  border: 1.5px solid var(--line);
 }
-.order-avatar.pending { color: #b45309; background: var(--amber-soft); }
-.order-avatar.priced  { color: var(--trust-blue-dark); background: var(--blue-soft); }
-.order-avatar.locked  { color: #047857; background: var(--mint-soft); }
+.order-avatar.pending { color: #b45309; background: var(--amber-soft); border-color: #fde68a; }
+.order-avatar.priced  { color: var(--brand-deep); background: var(--brand-soft); border-color: var(--brand-border); }
+.order-avatar.locked  { color: #047857; background: var(--mint-soft); border-color: #a7f3d0; }
 
 .order-info { flex: 1; min-width: 0; }
 
 .order-info h4 {
   font-size: 0.98rem;
-  font-weight: 700;
+  font-weight: 800;
   margin: 0 0 4px;
   white-space: nowrap;
   overflow: hidden;
@@ -577,17 +570,9 @@ onMounted(fetchMarketplace);
   flex-wrap: wrap;
 }
 
-.meta-dot {
-  width: 3px;
-  height: 3px;
-  border-radius: 50%;
-  background: var(--line);
-}
+.meta-dot { width: 3px; height: 3px; border-radius: 50%; background: var(--line); }
 
-.order-meta .price {
-  font-weight: 700;
-  color: var(--ink);
-}
+.order-meta .price { font-weight: 700; color: var(--ink); }
 .order-meta .price.waiting {
   font-weight: 500;
   font-style: italic;
@@ -597,10 +582,11 @@ onMounted(fetchMarketplace);
 .unit-price {
   font-family: 'IBM Plex Mono', ui-monospace, monospace;
   font-size: 0.72rem;
-  font-weight: 600;
-  color: var(--slate-soft);
-  background: var(--mist);
-  padding: 2px 7px;
+  font-weight: 700;
+  color: var(--brand-deep);
+  background: var(--brand-soft);
+  border: 1px solid var(--brand-border);
+  padding: 2px 8px;
   border-radius: 999px;
 }
 
@@ -609,22 +595,19 @@ onMounted(fetchMarketplace);
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 5px 10px;
+  padding: 5px 11px;
   font-size: 0.7rem;
-  font-weight: 700;
+  font-weight: 800;
   letter-spacing: 0.05em;
   border-radius: 999px;
   white-space: nowrap;
+  border: 1px solid transparent;
 }
-.status-dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: currentColor;
-}
-.status-badge.pending { color: #b45309; background: var(--amber-soft); }
-.status-badge.priced  { color: var(--trust-blue-dark); background: var(--blue-soft); }
-.status-badge.locked  { color: #047857; background: var(--mint-soft); }
+.status-dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+
+.status-badge.pending { color: #b45309; background: var(--amber-soft); border-color: #fde68a; }
+.status-badge.priced  { color: var(--brand-deep); background: var(--brand-soft); border-color: var(--brand-border); }
+.status-badge.locked  { color: #047857; background: var(--mint-soft); border-color: #a7f3d0; }
 
 /* Stepper */
 .order-stepper {
@@ -633,18 +616,18 @@ onMounted(fetchMarketplace);
   gap: 8px;
   margin-top: 16px;
   padding-top: 14px;
-  border-top: 1px dashed var(--line);
+  border-top: 1px dashed var(--brand-border);
 }
 
 .order-stepper .step {
   font-size: 0.7rem;
-  font-weight: 600;
+  font-weight: 700;
   letter-spacing: 0.04em;
   text-transform: uppercase;
   color: #cbd5e1;
   transition: color 0.25s ease;
 }
-.order-stepper .step.done { color: var(--slate-soft); }
+.order-stepper .step.done { color: var(--brand-deep); }
 
 .step-line {
   flex: 1;
@@ -653,16 +636,12 @@ onMounted(fetchMarketplace);
   border-radius: 1px;
   transition: background 0.35s ease;
 }
-.step-line.done { background: var(--mint); }
+.step-line.done { background: var(--brand); }
 
 /* =========================================================
-   QUOTE INPUT + ACTIONS
+   QUOTE INPUT + ACTIONS — highly visible blue border
    ========================================================= */
-.order-actions {
-  display: flex;
-  justify-content: flex-end;
-  margin-top: 14px;
-}
+.order-actions { display: flex; justify-content: flex-end; margin-top: 14px; }
 
 .price-input-box {
   display: flex;
@@ -672,11 +651,7 @@ onMounted(fetchMarketplace);
   justify-content: flex-end;
 }
 
-.price-field {
-  position: relative;
-  flex: 1;
-  max-width: 260px;
-}
+.price-field { position: relative; flex: 1; max-width: 260px; }
 
 .price-field .currency {
   position: absolute;
@@ -684,22 +659,22 @@ onMounted(fetchMarketplace);
   top: 50%;
   transform: translateY(-50%);
   font-size: 0.9rem;
-  font-weight: 700;
-  color: var(--slate-soft);
+  font-weight: 800;
+  color: var(--brand-deep);
   pointer-events: none;
 }
 
 .price-field input {
   width: 100%;
-  padding: 10px 14px 10px 28px;
-  border: 1px solid var(--line);
+  padding: 11px 14px 11px 28px;
+  border: 1.5px solid var(--brand-input);
   border-radius: 9px;
   font-size: 0.9rem;
-  font-weight: 600;
+  font-weight: 700;
   color: var(--ink);
   background: var(--white);
   box-sizing: border-box;
-  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
   -moz-appearance: textfield;
 }
 .price-field input::-webkit-outer-spin-button,
@@ -711,10 +686,12 @@ onMounted(fetchMarketplace);
   font-weight: 500;
   color: #94a3b8;
 }
+.price-field input:hover { border-color: var(--brand-hover); }
 .price-field input:focus {
   outline: none;
-  border-color: var(--trust-blue);
-  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+  border-color: var(--brand);
+  background: #f8fbff;
+  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.18);
 }
 
 /* Buttons */
@@ -723,20 +700,24 @@ onMounted(fetchMarketplace);
   align-items: center;
   justify-content: center;
   gap: 8px;
-  padding: 11px 20px;
+  padding: 12px 22px;
   font-size: 0.9rem;
   font-weight: 700;
   color: var(--white);
-  background: var(--trust-blue);
+  background: linear-gradient(135deg, var(--brand) 0%, var(--brand-dark) 100%);
   border: none;
   border-radius: 9px;
   cursor: pointer;
-  transition: background 0.15s ease, transform 0.1s ease;
+  transition: filter 0.15s ease, transform 0.1s ease, box-shadow 0.15s ease;
   white-space: nowrap;
+  box-shadow: 0 4px 14px -4px rgba(37, 99, 235, 0.45);
 }
-.btn-primary:hover:not(:disabled) { background: var(--trust-blue-dark); }
+.btn-primary:hover:not(:disabled) {
+  filter: brightness(1.05);
+  box-shadow: 0 6px 18px -4px rgba(37, 99, 235, 0.55);
+}
 .btn-primary:active:not(:disabled) { transform: translateY(1px); }
-.btn-primary:disabled { opacity: 0.65; cursor: not-allowed; }
+.btn-primary:disabled { opacity: 0.65; cursor: not-allowed; box-shadow: none; }
 
 .btn-sm { padding: 10px 16px; font-size: 0.84rem; }
 
@@ -746,7 +727,7 @@ onMounted(fetchMarketplace);
   gap: 6px;
   margin: 14px 0 0;
   font-size: 0.8rem;
-  font-weight: 600;
+  font-weight: 700;
   color: #047857;
 }
 .locked-note svg { width: 14px; height: 14px; }
@@ -765,22 +746,18 @@ onMounted(fetchMarketplace);
   color: var(--slate-soft);
 }
 .state-view p { margin: 0; font-size: 0.9rem; }
-.state-view h4 {
-  margin: 0;
-  font-size: 1.05rem;
-  font-weight: 700;
-  color: var(--ink);
-}
+.state-view h4 { margin: 0; font-size: 1.05rem; font-weight: 800; color: var(--ink); }
 
 .empty-icon {
-  width: 64px;
-  height: 64px;
-  border-radius: 16px;
+  width: 68px;
+  height: 68px;
+  border-radius: 18px;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--slate-soft);
-  background: var(--mist);
+  color: var(--brand-dark);
+  background: var(--brand-soft);
+  border: 1.5px solid var(--brand-border);
   margin-bottom: 4px;
 }
 .empty-icon svg { width: 36px; height: 36px; }
@@ -802,14 +779,14 @@ onMounted(fetchMarketplace);
   width: 30px;
   height: 30px;
   border-width: 3px;
-  border-color: var(--line);
-  border-top-color: var(--trust-blue);
-  color: var(--trust-blue);
+  border-color: var(--brand-border);
+  border-top-color: var(--brand);
+  color: var(--brand);
 }
 @keyframes spin { to { transform: rotate(360deg); } }
 
 /* =========================================================
-   TOASTS
+   TOASTS — success uses brand blue
    ========================================================= */
 .toast-container {
   position: fixed;
@@ -839,7 +816,7 @@ onMounted(fetchMarketplace);
   animation: slideIn 0.3s ease forwards;
   transition: transform 0.2s ease, opacity 0.2s ease;
 }
-.toast.success { background: var(--mint); }
+.toast.success { background: var(--brand); }
 .toast.error   { background: #ef4444; }
 .toast:hover { opacity: 0.92; transform: scale(1.01); }
 
@@ -856,7 +833,7 @@ onMounted(fetchMarketplace);
 a:focus-visible,
 button:focus-visible,
 input:focus-visible {
-  outline: 2px solid var(--trust-blue);
+  outline: 2px solid var(--brand);
   outline-offset: 2px;
 }
 
@@ -867,7 +844,7 @@ input:focus-visible {
   .dash-header { padding: 14px 20px; }
   .workspace-label { display: none; }
   .dash-main { padding: 28px 16px 60px; }
-  .orders-card { padding: 20px; }
+  .orders-card { padding: 22px 20px; }
   .page-intro h1 { font-size: 1.5rem; }
   .orders-header { align-items: stretch; }
   .filter-pills { width: 100%; overflow-x: auto; }
